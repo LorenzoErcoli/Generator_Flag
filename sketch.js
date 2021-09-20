@@ -9,6 +9,9 @@ let animation = false;
 let instant_fc = 0;
 let deltaframeCount = 0;
 let f_animation = 0
+let stop_frame = 0
+let deltastop =  0
+let start_stop_frame = 0
 
 
 
@@ -20,7 +23,7 @@ function setup() {
 
 	num_shape = int(random(1,4))
 	for (ns = 0; ns < num_shape; ns++){
-		shapevalue = randomvalue()
+		shapevalue = randomvalue(ns)
 		append(list_shapevalue, shapevalue)
 	}
 }
@@ -48,18 +51,22 @@ function draw() {
 
 
 
-function randomvalue(){
+function randomvalue(num_inc){
 
-	x_sft = int(random(1,window.innerWidth/2))
-	side_sh = int(random(1,700))
+	l_incshape = [1,0.8,0.5,0.3,0.2]
+
+
+
+	x_sft = int(random(-window.innerWidth/4,window.innerWidth/4))
+	side_sh = int(random(1,600))* l_incshape[num_inc]
 	d_degree = int(random(90))
 	type_shape = int(random(5))
-	n_rot = int(random(1,10))
+	n_rot = int(random(1,8))
 
-	end_point = int(random(1,window.innerWidth/1.5))
-	freq = int(random(1,10))
+	end_point = int(random(-window.innerWidth/2,window.innerWidth/2))
+	freq = int(random(1,8))
 
-	n_color = int(random(0,10))
+	n_color = int(random(0,8))
 
 	return shapevalue = [x_sft, side_sh, d_degree, type_shape, n_rot, end_point, freq ,n_color]
 
@@ -89,16 +96,20 @@ function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltafra
 		drawingContext.shadowColor = color(palette[indexcolor]);
 
 		if (animation == true){
-			deltaframeCount = animationplay(f_animation)
-			f_animation = deltaframeCount * 0.02
+			deltaframeCount = animationinc(instant_fc)
+			f_animation = deltaframeCount *0.1
+
 		} else if (animation == false){
 			f_animation = f_animation
 		}
 
+
+
+
 		for (ddeg = 0; ddeg < n_rot; ddeg++){
 			push()
 			rotate(360/n_rot*ddeg + d_degree + f_animation)
-			drawRandomShape(x_sft + f_animation * 10 ,0,side_sh ,side_sh + f_animation * 2, type_shape)
+			drawRandomShape(x_sft + f_animation * 10 ,0, side_sh + f_animation * 2 ,side_sh + f_animation * 2, type_shape)
 			shape_propagation(x_sft , 0, side_sh + f_animation * 10 ,side_sh , type_shape, list_shapevalue[dns][5] , list_shapevalue[dns][6])
 			pop()
 		}
@@ -213,12 +224,16 @@ function createPalette(_url, percent = 100) {
   return arr;
 }
 
-function animationplay(instant_fc){
 
-	deltaframeCount =  instant_fc - frameCount
+
+function animationinc(instant_fc){
+
+	deltaframeCount =  frameCount - instant_fc 
 	return deltaframeCount
 
 }
+
+
 
 
 function keyPressed() {
@@ -228,14 +243,21 @@ function keyPressed() {
 		list_shapevalue = []
 		shapevalue = []
 		setup()
+
 	} else if (keyCode === SHIFT){
 		if (animation == false){
+
+			end_stop_frame = frameCount
+			stop_frame = stop_frame + (end_stop_frame - start_stop_frame)
+
+			instant_fc = stop_frame 
 			animation = true;
-			instant_fc = frameCount
 
 
 
 		} else if (animation == true){
+
+			start_stop_frame = frameCount
 			animation = false;
 
 
