@@ -5,6 +5,11 @@ let url = [
 ];
 
 let list_shapevalue = []
+let animation = false;
+let instant_fc = 0;
+let deltaframeCount = 0;
+let f_animation = 0
+
 
 
 
@@ -61,16 +66,18 @@ function randomvalue(){
 }
 
 
+
+
 function drawflag(w,h){
 
 	for (dns = 0; dns < num_shape; dns++){
-		kalShape(list_shapevalue[dns][0],list_shapevalue[dns][1],list_shapevalue[dns][2],list_shapevalue[dns][3],list_shapevalue[dns][4],w,h)
+		kalShape(list_shapevalue[dns][0],list_shapevalue[dns][1],list_shapevalue[dns][2],list_shapevalue[dns][3],list_shapevalue[dns][4],w,h,animation,instant_fc)
 	}
 
 }
 
 
-function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h){
+function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltaframeCount){
 
 	push()
 		translate(w/2, h/2)
@@ -81,11 +88,18 @@ function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h){
 		drawingContext.shadowBlur = 20;
 		drawingContext.shadowColor = color(palette[indexcolor]);
 
+		if (animation == true){
+			deltaframeCount = animationplay(f_animation)
+			f_animation = deltaframeCount * 0.02
+		} else if (animation == false){
+			f_animation = f_animation
+		}
+
 		for (ddeg = 0; ddeg < n_rot; ddeg++){
 			push()
-			rotate(360/n_rot*ddeg + d_degree)
-			drawRandomShape(x_sft ,0,side_sh ,side_sh , type_shape)
-			shape_propagation(x_sft , 0, side_sh  ,side_sh , type_shape, list_shapevalue[dns][5] , list_shapevalue[dns][6])
+			rotate(360/n_rot*ddeg + d_degree + f_animation)
+			drawRandomShape(x_sft + f_animation * 10 ,0,side_sh ,side_sh + f_animation * 2, type_shape)
+			shape_propagation(x_sft , 0, side_sh + f_animation * 10 ,side_sh , type_shape, list_shapevalue[dns][5] , list_shapevalue[dns][6])
 			pop()
 		}
 	pop()
@@ -199,6 +213,13 @@ function createPalette(_url, percent = 100) {
   return arr;
 }
 
+function animationplay(instant_fc){
+
+	deltaframeCount =  instant_fc - frameCount
+	return deltaframeCount
+
+}
+
 
 function keyPressed() {
 	if (keyCode === BACKSPACE) {
@@ -207,8 +228,23 @@ function keyPressed() {
 		list_shapevalue = []
 		shapevalue = []
 		setup()
+	} else if (keyCode === SHIFT){
+		if (animation == false){
+			animation = true;
+			instant_fc = frameCount
+
+
+
+		} else if (animation == true){
+			animation = false;
+
+
+		}
+
 	}
 }
+
+
 
 function mouseClicked() {
  print("mi")
