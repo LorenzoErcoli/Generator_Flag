@@ -1,7 +1,7 @@
 let url = [
   //https://coolors.co/264653-2a9d8f-e9c46a-f4a261-e76f51",
   //"https://coolors.co/001219-005f73-0a9396-94d2bd-e9d8a6-ee9b00-ca6702-bb3e03-ae2012-9b2226",
-  "https://coolors.co/9b5de5-f15bb5-fee440-00bbf9-00f5d4",
+  "https://coolors.co/9b5de5-f15bb5-fee440-00bbf9-00f5d4-001219-005f73-0a9396-94d2bd-e9d8a6",
 ];
 
 let list_shapevalue = []
