@@ -12,7 +12,9 @@ let f_animation = 0
 let stop_frame = 0
 let deltastop =  0
 let start_stop_frame = 0
-
+let timeloop = 50
+let speedtime = 0.05
+let is_incrementing_timeloop = 1
 
 
 
@@ -22,6 +24,7 @@ function setup() {
 	angleMode(DEGREES);
 
 	num_shape = int(random(1,4))
+	
 	for (ns = 0; ns < num_shape; ns++){
 		shapevalue = randomvalue(ns)
 		append(list_shapevalue, shapevalue)
@@ -34,6 +37,7 @@ function draw() {
 	//resize flags
 	var w = window.innerWidth;
 	var h = window.innerHeight;
+
 	c = createCanvas(w, h);
 
 	clear();
@@ -95,9 +99,11 @@ function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltafra
 		drawingContext.shadowBlur = 20;
 		drawingContext.shadowColor = color(palette[indexcolor]);
 
+
+
+		//ANIMATION//
 		if (animation == true){
-			deltaframeCount = animationinc(instant_fc)
-			f_animation = deltaframeCount *0.1
+			f_animation = animationloop(f_animation, timeloop, speedtime)
 
 		} else if (animation == false){
 			f_animation = f_animation
@@ -235,6 +241,28 @@ function animationinc(instant_fc){
 
 
 
+function animationloop(deltaframeCount, timeloop, speedtime){
+
+	let parsed_deltaframeCount = parseFloat(deltaframeCount).toFixed(2)
+
+	if (parsed_deltaframeCount == timeloop){
+		is_incrementing_timeloop = -1;
+	} else if(parsed_deltaframeCount == 0){
+		is_incrementing_timeloop = +1;
+	}
+
+	deltaframeCount = deltaframeCount + speedtime * is_incrementing_timeloop;
+	return deltaframeCount
+}
+
+
+
+	// end_stop_frame = frameCount
+	// stop_frame = stop_frame + (end_stop_frame - start_stop_frame)
+	// instant_fc = stop_frame
+
+
+	// start_stop_frame = frameCount
 
 function keyPressed() {
 	if (keyCode === BACKSPACE) {
@@ -242,22 +270,14 @@ function keyPressed() {
 	} else if (keyCode === ENTER){
 		list_shapevalue = []
 		shapevalue = []
+		deltaframeCount = 0
 		setup()
 
 	} else if (keyCode === SHIFT){
 		if (animation == false){
-
-			end_stop_frame = frameCount
-			stop_frame = stop_frame + (end_stop_frame - start_stop_frame)
-
-			instant_fc = stop_frame 
 			animation = true;
 
-
-
 		} else if (animation == true){
-
-			start_stop_frame = frameCount
 			animation = false;
 
 
