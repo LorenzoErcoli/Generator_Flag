@@ -270,7 +270,7 @@ function keyPressed() {
 	} else if (keyCode === ENTER){
 		list_shapevalue = []
 		shapevalue = []
-		deltaframeCount = 0
+		f_animation = 0
 		setup()
 
 	} else if (keyCode === SHIFT){
