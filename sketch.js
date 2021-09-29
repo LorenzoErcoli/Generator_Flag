@@ -12,8 +12,8 @@ let f_animation = 0
 let stop_frame = 0
 let deltastop =  0
 let start_stop_frame = 0
-let timeloop = 50
-let speedtime = 0.05
+let timeloop = 25
+let speedtime = 0.025
 let is_incrementing_timeloop = 1
 
 
@@ -82,13 +82,13 @@ function randomvalue(num_inc){
 function drawflag(w,h){
 
 	for (dns = 0; dns < num_shape; dns++){
-		kalShape(list_shapevalue[dns][0],list_shapevalue[dns][1],list_shapevalue[dns][2],list_shapevalue[dns][3],list_shapevalue[dns][4],w,h,animation,instant_fc)
+		kalShape(list_shapevalue[dns][0],list_shapevalue[dns][1],list_shapevalue[dns][2],list_shapevalue[dns][3],list_shapevalue[dns][4],w,h,animation,instant_fc,l_incshape[dns])
 	}
 
 }
 
 
-function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltaframeCount){
+function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltaframeCount,l_incshape){
 
 	push()
 		translate(w/2, h/2)
@@ -115,8 +115,8 @@ function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltafra
 		for (ddeg = 0; ddeg < n_rot; ddeg++){
 			push()
 			rotate(360/n_rot*ddeg + d_degree + f_animation)
-			drawRandomShape(x_sft + f_animation * 10 ,0, side_sh + f_animation * 2 ,side_sh + f_animation * 2, type_shape)
-			shape_propagation(x_sft , 0, side_sh + f_animation * 10 ,side_sh , type_shape, list_shapevalue[dns][5] , list_shapevalue[dns][6])
+			drawRandomShape(x_sft + (f_animation * 10 * l_incshape) ,0, side_sh + (f_animation * 2 * l_incshape) ,side_sh + (f_animation * 2 * l_incshape), type_shape)
+			shape_propagation(x_sft , 0, side_sh + (f_animation * 10 * l_incshape) ,side_sh , type_shape, list_shapevalue[dns][5] , list_shapevalue[dns][6])
 			pop()
 		}
 	pop()
@@ -267,6 +267,8 @@ function animationloop(deltaframeCount, timeloop, speedtime){
 function keyPressed() {
 	if (keyCode === BACKSPACE) {
 		saveCanvas('/flags', 'jpg');
+
+
 	} else if (keyCode === ENTER){
 		list_shapevalue = []
 		shapevalue = []
@@ -279,6 +281,7 @@ function keyPressed() {
 
 		} else if (animation == true){
 			animation = false;
+			f_animation = 0
 
 
 		}
