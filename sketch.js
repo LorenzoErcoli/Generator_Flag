@@ -1,21 +1,21 @@
 let url = [
   //https://coolors.co/264653-2a9d8f-e9c46a-f4a261-e76f51",
-  //"https://coolors.co/001219-005f73-0a9396-94d2bd-e9d8a6-ee9b00-ca6702-bb3e03-ae2012-9b2226",
-  "https://coolors.co/9b5de5-f15bb5-fee440-00bbf9-00f5d4-001219-005f73-0a9396-94d2bd-e9d8a6",
+  "https://coolors.co/001219-005f73-0a9396-94d2bd-e9d8a6-ee9b00-ca6702-bb3e03-ae2012-9b2226",
+  //"https://coolors.co/9b5de5-f15bb5-fee440-00bbf9-00f5d4-001219-005f73-0a9396-94d2bd-e9d8a6",
 ];
 
 let list_shapevalue = []
 let animation = false;
 let instant_fc = 0;
 let deltaframeCount = 0;
-let f_animation = 0
-let stop_frame = 0
-let deltastop =  0
-let start_stop_frame = 0
-let timeloop = 25
-let speedtime = 0.025
-let is_incrementing_timeloop = 1
-
+let f_animation = 0;
+let stop_frame = 0;
+let deltastop =  0;
+let start_stop_frame = 0;
+let timeloop = 50;
+let speedtime = 0.0025;
+let is_incrementing_timeloop = 1;
+let iter_number = 1;
 
 
 function setup() {
@@ -243,16 +243,34 @@ function animationinc(instant_fc){
 
 function animationloop(deltaframeCount, timeloop, speedtime){
 
-	let parsed_deltaframeCount = parseFloat(deltaframeCount).toFixed(2)
+	// let parsed_deltaframeCount = parseFloat(deltaframeCount).toFixed(2)
+	let parsed_deltaframeCount = int(deltaframeCount)
+	console.log(parsed_deltaframeCount)
+
+
+	speedtime =	speedtime * (iter_number / 50)
+	console.log(speedtime)
+
 
 	if (parsed_deltaframeCount == timeloop){
 		is_incrementing_timeloop = -1;
+
+
 	} else if(parsed_deltaframeCount == 0){
 		is_incrementing_timeloop = +1;
 	}
 
+
+
 	deltaframeCount = deltaframeCount + speedtime * is_incrementing_timeloop;
-	return deltaframeCount
+
+	if (int(deltaframeCount) < timeloop/2){
+		iter_number++
+		} else {
+		iter_number--
+	}
+
+	return deltaframeCount;
 }
 
 
@@ -273,6 +291,7 @@ function keyPressed() {
 		list_shapevalue = []
 		shapevalue = []
 		f_animation = 0
+		iter_number = 1;
 		setup()
 
 	} else if (keyCode === SHIFT){
@@ -282,6 +301,7 @@ function keyPressed() {
 		} else if (animation == true){
 			animation = false;
 			f_animation = 0
+			iter_number = 1;
 
 
 		}
