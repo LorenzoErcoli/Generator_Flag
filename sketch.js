@@ -12,10 +12,37 @@ let f_animation = 0;
 let stop_frame = 0;
 let deltastop =  0;
 let start_stop_frame = 0;
-let timeloop = 50;
-let speedtime = 0.0025;
+let timeloop = 75;
+let speedtime = 0.005;
 let is_incrementing_timeloop = 1;
 let iter_number = 1;
+
+const percent_numb_shape = {
+	5: 	 1,
+	40:  2,
+	100: 3
+}
+
+const percent_type_shape = {
+	25:  0, //"ellipse",
+	50:  1, //"rect",
+	75:  2, //"triangle",
+	100: 3 //"hexagon",
+}
+
+const percent_rotation_shape = {
+	2:  1, 
+	5:  2, 
+	10: 3,
+	20: 4,
+	32: 5,
+	46: 6,
+	62: 7,
+	80: 8,
+	100: 9
+}
+
+
 
 
 function setup() {
@@ -23,12 +50,14 @@ function setup() {
 	colorMode(HSB, 360, 100, 100, 100);
 	angleMode(DEGREES);
 
-	num_shape = int(random(1,4))
+	console.log("rarità numero forme:")
+	num_shape = rarity_random(percent_numb_shape)
 	
 	for (ns = 0; ns < num_shape; ns++){
 		shapevalue = randomvalue(ns)
 		append(list_shapevalue, shapevalue)
 	}
+
 }
 
 
@@ -45,7 +74,7 @@ function draw() {
 	background(0, 0, 0);
 	blendMode(ADD);
 
-	backpattern(w,h,100)
+	backpattern(w,h,2,100)
 	drawflag(w,h)
 
 }
@@ -64,10 +93,15 @@ function randomvalue(num_inc){
 	x_sft = int(random(-window.innerWidth/4,window.innerWidth/4))
 	side_sh = int(random(1,600))* l_incshape[num_inc]
 	d_degree = int(random(90))
-	type_shape = int(random(5))
-	n_rot = int(random(1,8))
+	
+	console.log("rarità forma:")
+	type_shape = rarity_random(percent_type_shape)
+
+	console.log("rarità rotazione:")
+	n_rot = rarity_random(percent_rotation_shape)
 
 	end_point = int(random(-window.innerWidth/2,window.innerWidth/2))
+
 	freq = int(random(1,8))
 
 	n_color = int(random(0,8))
@@ -96,10 +130,7 @@ function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltafra
 		stroke(palette[indexcolor]);
 		strokeWeight(8)
 
-		drawingContext.shadowBlur = 20;
 		drawingContext.shadowColor = color(palette[indexcolor]);
-
-
 
 		//ANIMATION//
 		if (animation == true){
@@ -123,6 +154,14 @@ function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltafra
 }
 
 
+function f_shadowBlur(side_sh,minBlur, maxBlur){
+
+	shadowBlur = side_sh * (minBlur/maxBlur)
+	return shadowBlur;
+}
+	
+
+
 
 function shape_propagation(x, y, w, h, shape_num, end_point, freq){
 
@@ -142,6 +181,10 @@ function shape_propagation(x, y, w, h, shape_num, end_point, freq){
 
 
 function drawRandomShape(x, y, w, h, shape_num) {
+
+	ind_shadowBlur = f_shadowBlur(h, 30, 10)
+	drawingContext.shadowBlur = ind_shadowBlur;
+
   switch (shape_num) {
     case 0:
       ellipse(x, y, w, h)
@@ -188,10 +231,7 @@ function polygon(x, y, radius, npoints) {
 
 
 
-
-
-
-function backpattern(w,h,side_sq){
+function backpattern(w,h,wdp,side_sq){
 
 
 	push();
@@ -202,12 +242,10 @@ function backpattern(w,h,side_sq){
 	w_inc = (w - w_marg)/side_sq
 	h_inc = (h - h_marg)/side_sq
 
-	var wdp = 2
-
 	for (wx = 1; wx < w_inc; wx++){
 		for (hx = 1; hx < h_inc; hx++){
 
-			strokeWeight(1)
+			strokeWeight(wdp)
 			stroke(palette[4]);
 			drawingContext.shadowBlur = 30;
 			drawingContext.shadowColor = color(palette[4]);
@@ -218,6 +256,8 @@ function backpattern(w,h,side_sq){
 	}
 
 }
+
+
 
 
 function createPalette(_url, percent = 100) {
@@ -232,6 +272,8 @@ function createPalette(_url, percent = 100) {
 
 
 
+
+
 function animationinc(instant_fc){
 
 	deltaframeCount =  frameCount - instant_fc 
@@ -243,13 +285,10 @@ function animationinc(instant_fc){
 
 function animationloop(deltaframeCount, timeloop, speedtime){
 
-	// let parsed_deltaframeCount = parseFloat(deltaframeCount).toFixed(2)
 	let parsed_deltaframeCount = int(deltaframeCount)
-	console.log(parsed_deltaframeCount)
+	// parsed_deltaframeCount = int(deltaframeCount)
 
-
-	speedtime =	speedtime * (iter_number / 50)
-	console.log(speedtime)
+	speedtime =	speedtime * (iter_number / 10)
 
 
 	if (parsed_deltaframeCount == timeloop){
@@ -264,7 +303,7 @@ function animationloop(deltaframeCount, timeloop, speedtime){
 
 	deltaframeCount = deltaframeCount + speedtime * is_incrementing_timeloop;
 
-	if (int(deltaframeCount) < timeloop/2){
+	if (int(deltaframeCount) < int(timeloop/2)){
 		iter_number++
 		} else {
 		iter_number--
@@ -274,13 +313,37 @@ function animationloop(deltaframeCount, timeloop, speedtime){
 }
 
 
+function rarity_random(object){
 
-	// end_stop_frame = frameCount
-	// stop_frame = stop_frame + (end_stop_frame - start_stop_frame)
-	// instant_fc = stop_frame
+	numb_random = random(0,100)
+	key_array = Object.keys(object)
+	lenght_object = key_array.length
 
 
-	// start_stop_frame = frameCount
+	for (x = 0; x < lenght_object; x++){
+		if (numb_random < key_array[x]){
+			exit_value = key_array[x]
+
+
+			if (x == 0){
+				percent_value = key_array[x]
+			}else{
+				percent_value = (key_array[x] - key_array[x-1]);
+			}
+
+			console.log(percent_value + "%")
+
+
+			return object[exit_value]
+			break;
+		}
+	}
+
+
+}
+
+
+
 
 function keyPressed() {
 	if (keyCode === BACKSPACE) {
