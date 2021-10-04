@@ -47,11 +47,10 @@ const percent_rotation_shape = {
 
 function setup() {
 
-	colorMode(HSB, 360, 100, 100, 100);
+	colorMode(HSB, 360, 100, 100, 10);
 	angleMode(DEGREES);
 
-	console.log("rarità numero forme:")
-	num_shape = rarity_random(percent_numb_shape)
+	num_shape = rarity_random(percent_numb_shape, "numero forme")
 	
 	for (ns = 0; ns < num_shape; ns++){
 		shapevalue = randomvalue(ns)
@@ -94,11 +93,9 @@ function randomvalue(num_inc){
 	side_sh = int(random(1,600))* l_incshape[num_inc]
 	d_degree = int(random(90))
 	
-	console.log("rarità forma:")
-	type_shape = rarity_random(percent_type_shape)
+	type_shape = rarity_random(percent_type_shape,"forma")
 
-	console.log("rarità rotazione:")
-	n_rot = rarity_random(percent_rotation_shape)
+	n_rot = rarity_random(percent_rotation_shape,"rotazione")
 
 	end_point = int(random(-window.innerWidth/2,window.innerWidth/2))
 
@@ -126,10 +123,8 @@ function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltafra
 
 	push()
 		translate(w/2, h/2)
-		indexcolor = list_shapevalue[dns][7]
-		stroke(palette[indexcolor]);
-		strokeWeight(8)
 
+		color_setup(list_shapevalue[dns][7], 6, 0)
 		drawingContext.shadowColor = color(palette[indexcolor]);
 
 		//ANIMATION//
@@ -140,9 +135,7 @@ function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltafra
 			f_animation = f_animation
 		}
 
-
-
-
+		
 		for (ddeg = 0; ddeg < n_rot; ddeg++){
 			push()
 			rotate(360/n_rot*ddeg + d_degree + f_animation)
@@ -154,9 +147,28 @@ function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltafra
 }
 
 
+
+function color_setup(code_color, stroke_wgt, index_propagation, n_propagation){
+
+
+
+			if (index_propagation == 0){
+				incrementing_alpha = 255
+			}else{
+				incrementing_alpha =  255 - (255/n_propagation) * index_propagation+1
+
+			}
+
+			indexcolor = code_color
+			stroke(palette[indexcolor % incrementing_alpha]);
+			strokeWeight(stroke_wgt)
+		}
+
+
 function f_shadowBlur(side_sh,minBlur, maxBlur){
 
 	shadowBlur = side_sh * (minBlur/maxBlur)
+	// console.log(shadowBlur)
 	return shadowBlur;
 }
 	
@@ -165,12 +177,16 @@ function f_shadowBlur(side_sh,minBlur, maxBlur){
 
 function shape_propagation(x, y, w, h, shape_num, end_point, freq){
 
+
+
 	c_point = -(end_point - x) 
 	d_shift = (end_point) / freq
 	d_w_side = w / freq
 	d_h_side = h / freq
 
 	for (xsp = 0; xsp < freq; xsp++){
+
+		color_setup(list_shapevalue[dns][7], 6, xsp+1 ,freq)
 		drawRandomShape(  c_point+(d_shift*xsp), y, d_w_side*xsp, d_h_side*xsp, shape_num)
 	}
 
@@ -182,7 +198,7 @@ function shape_propagation(x, y, w, h, shape_num, end_point, freq){
 
 function drawRandomShape(x, y, w, h, shape_num) {
 
-	ind_shadowBlur = f_shadowBlur(h, 30, 10)
+	ind_shadowBlur = f_shadowBlur(w, 5, 10)
 	drawingContext.shadowBlur = ind_shadowBlur;
 
   switch (shape_num) {
@@ -313,7 +329,7 @@ function animationloop(deltaframeCount, timeloop, speedtime){
 }
 
 
-function rarity_random(object){
+function rarity_random(object, typename){
 
 	numb_random = random(0,100)
 	key_array = Object.keys(object)
@@ -331,7 +347,8 @@ function rarity_random(object){
 				percent_value = (key_array[x] - key_array[x-1]);
 			}
 
-			console.log(percent_value + "%")
+			console.log("Rarità " + typename + ": " + percent_value + "%")
+			console.log("——" + typename + " = " + object[exit_value])
 
 
 			return object[exit_value]
