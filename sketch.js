@@ -12,8 +12,9 @@ let f_animation = 0;
 let stop_frame = 0;
 let deltastop =  0;
 let start_stop_frame = 0;
-let timeloop = 75;
-let speedtime = 0.005;
+let timeloop = 51;
+let speedtime_or = 0.0005;
+let speedtime = speedtime_or
 let is_incrementing_timeloop = 1;
 let iter_number = 1;
 
@@ -31,17 +32,29 @@ const percent_type_shape = {
 }
 
 const percent_rotation_shape = {
-	2:  1, 
-	5:  2, 
-	10: 3,
-	20: 4,
-	32: 5,
-	46: 6,
-	62: 7,
-	80: 8,
-	100: 9
+	10:   1,
+	20:   2,
+	32:  3,
+	46:  4,
+	60:  5,
+	78:  6, 
+	100: 7
 }
 
+const percent_shadow = {
+	10:   120,
+	25:   80,
+	55:   60,
+	100:  30,
+}
+
+const percent_propagation = {
+	11:  1,
+	30:  2,
+	55:  3,
+	75:  4,
+	100: 5,
+}
 
 
 
@@ -70,6 +83,7 @@ function draw() {
 
 	clear();
 	palette = createPalette(random(url), 100);
+
 	background(0, 0, 0);
 	blendMode(ADD);
 
@@ -85,25 +99,26 @@ function draw() {
 
 function randomvalue(num_inc){
 
-	l_incshape = [1,0.8,0.5,0.3,0.2]
-
+	l_incshape = [1,0.8,0.5]
 
 
 	x_sft = int(random(-window.innerWidth/4,window.innerWidth/4))
 	side_sh = int(random(1,600))* l_incshape[num_inc]
 	d_degree = int(random(90))
 	
-	type_shape = rarity_random(percent_type_shape,"forma")
 
-	n_rot = rarity_random(percent_rotation_shape,"rotazione")
+	type_shape = rarity_random(percent_type_shape,"Forma")
+	n_rot = rarity_random(percent_rotation_shape,"Rotazione")
 
 	end_point = int(random(-window.innerWidth/2,window.innerWidth/2))
 
-	freq = int(random(1,8))
+	propagation = rarity_random(percent_propagation, "propagazioni") 
 
 	n_color = int(random(0,8))
 
-	return shapevalue = [x_sft, side_sh, d_degree, type_shape, n_rot, end_point, freq ,n_color]
+	shadow_index = rarity_random(percent_shadow,"Luminanza")
+
+	return shapevalue = [x_sft, side_sh, d_degree, type_shape, n_rot, end_point, propagation ,n_color]
 
 }
 
@@ -111,7 +126,7 @@ function randomvalue(num_inc){
 
 
 function drawflag(w,h){
-
+	ind_shadowBlur = f_shadowBlur(w, 6, 10)
 	for (dns = 0; dns < num_shape; dns++){
 		kalShape(list_shapevalue[dns][0],list_shapevalue[dns][1],list_shapevalue[dns][2],list_shapevalue[dns][3],list_shapevalue[dns][4],w,h,animation,instant_fc,l_incshape[dns])
 	}
@@ -124,8 +139,7 @@ function kalShape(x_sft,side_sh,d_degree,type_shape,n_rot,w,h,animation,deltafra
 	push()
 		translate(w/2, h/2)
 
-		color_setup(list_shapevalue[dns][7], 6, 0)
-		drawingContext.shadowColor = color(palette[indexcolor]);
+		color_setup(list_shapevalue[dns][7], 5, 0, 0)
 
 		//ANIMATION//
 		if (animation == true){
@@ -153,21 +167,27 @@ function color_setup(code_color, stroke_wgt, index_propagation, n_propagation){
 
 
 			if (index_propagation == 0){
-				incrementing_alpha = 255
+				incrementing_alpha = 100
 			}else{
-				incrementing_alpha =  255 - (255/n_propagation) * index_propagation+1
-
+				incrementing_alpha = 2*index_propagation
 			}
 
 			indexcolor = code_color
-			stroke(palette[indexcolor % incrementing_alpha]);
+			shapecolor = color(palette[indexcolor])
+			shapecolor.setAlpha(incrementing_alpha)
+			stroke(shapecolor);
 			strokeWeight(stroke_wgt)
+
+
+			drawingContext.shadowColor = color(palette[indexcolor]);
+			drawingContext.shadowBlur = 60;
 		}
 
 
-function f_shadowBlur(side_sh,minBlur, maxBlur){
+function f_shadowBlur(side_sh, minBlur, maxBlur){
 
-	shadowBlur = side_sh * (minBlur/maxBlur)
+	start = shadow_index
+	shadowBlur = shadow_index - side_sh * (maxBlur/minBlur)
 	// console.log(shadowBlur)
 	return shadowBlur;
 }
@@ -175,18 +195,18 @@ function f_shadowBlur(side_sh,minBlur, maxBlur){
 
 
 
-function shape_propagation(x, y, w, h, shape_num, end_point, freq){
+function shape_propagation(x, y, w, h, shape_num, end_point, propagation){
 
 
 
 	c_point = -(end_point - x) 
-	d_shift = (end_point) / freq
-	d_w_side = w / freq
-	d_h_side = h / freq
+	d_shift = (end_point) / propagation
+	d_w_side = w / propagation
+	d_h_side = h / propagation
 
-	for (xsp = 0; xsp < freq; xsp++){
+	for (xsp = 0; xsp < propagation; xsp++){
 
-		color_setup(list_shapevalue[dns][7], 6, xsp+1 ,freq)
+		color_setup(list_shapevalue[dns][7], 6, xsp, propagation)
 		drawRandomShape(  c_point+(d_shift*xsp), y, d_w_side*xsp, d_h_side*xsp, shape_num)
 	}
 
@@ -197,9 +217,6 @@ function shape_propagation(x, y, w, h, shape_num, end_point, freq){
 
 
 function drawRandomShape(x, y, w, h, shape_num) {
-
-	ind_shadowBlur = f_shadowBlur(w, 5, 10)
-	drawingContext.shadowBlur = ind_shadowBlur;
 
   switch (shape_num) {
     case 0:
@@ -347,8 +364,7 @@ function rarity_random(object, typename){
 				percent_value = (key_array[x] - key_array[x-1]);
 			}
 
-			console.log("Rarità " + typename + ": " + percent_value + "%")
-			console.log("——" + typename + " = " + object[exit_value])
+			console.log("Rarità " + typename + ": " + percent_value + "%" + " —— " + typename + " = " + object[exit_value])
 
 
 			return object[exit_value]
@@ -372,6 +388,9 @@ function keyPressed() {
 		shapevalue = []
 		f_animation = 0
 		iter_number = 1;
+		speedtime = speedtime_or
+
+		console.clear();
 		setup()
 
 	} else if (keyCode === SHIFT){
@@ -382,6 +401,7 @@ function keyPressed() {
 			animation = false;
 			f_animation = 0
 			iter_number = 1;
+			speedtime = speedtime_or
 
 
 		}
