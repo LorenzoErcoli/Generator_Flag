@@ -2,7 +2,10 @@
 <html>
 <head>
 	<title>NewFlagsGenerator	</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/p5@1.2.0/lib/p5.min.js"></script>
+    <script src="https://unpkg.com/ccapture.js@1.1.0/build/CCapture.all.min.js"></script>
+
+
 	<link rel="stylesheet" type="text/css" href="style.css">
 	<meta charset="utf-8" />
 </head>
@@ -11,8 +14,33 @@
 	<div class = "intro">
 		<h1>FlagsGenerator</h1>
 		<h2>flags that break everything, absolutely everything.</h2>
-		<h3>Press <u>ENTER</u> to change, <br> <u>SHIFT</u> to star or stop movement, <br> and <u>BACKSPACE</u> to save the image.</h3>
+		<h3>Press:<br>
+		<u>ENTER</u> to change flag,<br>
+		<u>SHIFT</u> to start or stop movement,<br>
+		<u>BACKSPACE</u> to save the image,<br>
+		<u>CONTROL</u> to save a GIF.</h3>
+
+		<div id ="downloaded_gif_text"><h1>wait, the gif will be downloaded in a few seconds</h1></div>
 	</div>
 	<script type="text/javascript" src="sketch.js"></script>
+
+	<script type="text/javascript" src="./src/CCapture.js"></script>
+<!-- 	<script type="text/javascript" src="./src/webm-writer-0.2.0.js"></script> -->
+	<script type="text/javascript" src="./src/gif.js"></script>
+	<script type="text/javascript" src="./src/gif.worker.js"></script>
+	<script type="text/javascript" src="./src/download.js"></script>
+	<script>
+
+		var capturer = new CCapture ({
+			format: 'gif',
+			workersPath: "output/",
+			framerate: 24,
+			verbose: true
+		})
+
+		// var capturer = new CCapture({ format: 'png', framerate: fps });
+
+	</script>
+
 </body>
 </html>

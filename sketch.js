@@ -1,3 +1,4 @@
+
 let url = [
   //https://coolors.co/264653-2a9d8f-e9c46a-f4a261-e76f51",
   "https://coolors.co/001219-005f73-0a9396-94d2bd-e9d8a6-ee9b00-ca6702-bb3e03-ae2012-9b2226",
@@ -13,10 +14,14 @@ let stop_frame = 0;
 let deltastop =  0;
 let start_stop_frame = 0;
 let timeloop = 51;
-let speedtime_or = 0.0005;
+let speedtime_or = 0.0025;
 let speedtime = speedtime_or
 let is_incrementing_timeloop = 1;
 let iter_number = 1;
+let startgif = false
+let gif_start_frameCount = 0
+
+let duration_gif = (timeloop * 2 ) - 2
 
 const percent_numb_shape = {
 	5: 	 1,
@@ -42,14 +47,15 @@ const percent_rotation_shape = {
 }
 
 const percent_shadow = {
-	10:   120,
-	25:   80,
-	55:   60,
-	100:  30,
+	10:   10,
+	25:   8,
+	55:   6,
+	100:  3,
 }
 
 const percent_propagation = {
-	11:  1,
+	6:  0,
+	13:  1,
 	30:  2,
 	55:  3,
 	75:  4,
@@ -57,11 +63,11 @@ const percent_propagation = {
 }
 
 
-
 function setup() {
 
 	colorMode(HSB, 360, 100, 100, 10);
 	angleMode(DEGREES);
+	frameRate(24)
 
 	num_shape = rarity_random(percent_numb_shape, "numero forme")
 	
@@ -70,16 +76,20 @@ function setup() {
 		append(list_shapevalue, shapevalue)
 	}
 
+	opacity_write('downloaded_gif_text',"off")
+
+
 }
 
 
 function draw() {
 
-	//resize flags
+
+
 	var w = window.innerWidth;
 	var h = window.innerHeight;
 
-	c = createCanvas(w, h);
+	c_canvas = createCanvas(w, h);
 
 	clear();
 	palette = createPalette(random(url), 100);
@@ -90,11 +100,41 @@ function draw() {
 	backpattern(w,h,2,100)
 	drawflag(w,h)
 
+	if(startgif == true){
+	creategif(gif_start_frameCount,duration_gif)
+	}
+}
+
+
+function creategif(gif_start_frameCount,duration_gif){
+	
+	gif_start_frameCount = gif_start_frameCount
+
+	if (frameCount === gif_start_frameCount + 1){
+		capturer.start()
+	}
+
+	capturer.capture(canvas)
+	
+	if (frameCount == gif_start_frameCount + duration_gif){
+		capturer.save()
+		capturer.stop()
+		startgif = false
+		opacity_write('downloaded_gif_text',"on")
+	}
 }
 
 
 
+function opacity_write(id,comand){
 
+	if(comand == "on"){
+		document.getElementById(id).style.opacity = "1";
+	}else if(comand == "off"){
+		document.getElementById(id).style.opacity = "0";
+	}
+
+}
 
 
 function randomvalue(num_inc){
@@ -180,7 +220,7 @@ function color_setup(code_color, stroke_wgt, index_propagation, n_propagation){
 
 
 			drawingContext.shadowColor = color(palette[indexcolor]);
-			drawingContext.shadowBlur = 60;
+			drawingContext.shadowBlur = 10;
 		}
 
 
@@ -188,7 +228,6 @@ function f_shadowBlur(side_sh, minBlur, maxBlur){
 
 	start = shadow_index
 	shadowBlur = shadow_index - side_sh * (maxBlur/minBlur)
-	// console.log(shadowBlur)
 	return shadowBlur;
 }
 	
@@ -321,7 +360,7 @@ function animationloop(deltaframeCount, timeloop, speedtime){
 	let parsed_deltaframeCount = int(deltaframeCount)
 	// parsed_deltaframeCount = int(deltaframeCount)
 
-	speedtime =	speedtime * (iter_number / 10)
+	speedtime =	speedtime * (iter_number)
 
 
 	if (parsed_deltaframeCount == timeloop){
@@ -331,8 +370,6 @@ function animationloop(deltaframeCount, timeloop, speedtime){
 	} else if(parsed_deltaframeCount == 0){
 		is_incrementing_timeloop = +1;
 	}
-
-
 
 	deltaframeCount = deltaframeCount + speedtime * is_incrementing_timeloop;
 
@@ -379,6 +416,8 @@ function rarity_random(object, typename){
 
 
 function keyPressed() {
+	opacity_write('downloaded_gif_text',"off")
+	
 	if (keyCode === BACKSPACE) {
 		saveCanvas('/flags', 'jpg');
 
@@ -399,15 +438,23 @@ function keyPressed() {
 
 		} else if (animation == true){
 			animation = false;
-			f_animation = 0
+			f_animation = 0;
 			iter_number = 1;
-			speedtime = speedtime_or
-
-
+			speedtime = speedtime_or;
 		}
 
 	}
+
+	if (keyCode === CONTROL) {
+		if(startgif == false){
+			animation = true;
+			startgif = true
+			console.log("gif")
+			gif_start_frameCount = frameCount
+		}
+  	}
 }
+
 
 
 

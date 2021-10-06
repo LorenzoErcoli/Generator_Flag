@@ -12,6 +12,15 @@ div{
 .intro{
 	z-index: 9999;
 	position: fixed;
-	color: white
+	color: white;
+	width: 100%;
 
 }
+
+#downloaded_gif_text{
+	opacity: 0;
+	text-align: center;
+	margin-top: 60vh;
+	color: red;
+}
+
